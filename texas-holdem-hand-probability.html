@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101a17">
+  <title>德州扑克最终牌型概率计算器</title>
+  <style>
+    :root {
+      --canvas: oklch(0.14 0.015 155);
+      --surface: oklch(0.185 0.018 155);
+      --surface-raised: oklch(0.225 0.022 155);
+      --surface-soft: oklch(0.265 0.026 155);
+      --ink: oklch(0.94 0.012 100);
+      --muted: oklch(0.72 0.025 150);
+      --line: oklch(0.38 0.03 155 / .72);
+      --gold: oklch(0.83 0.135 86);
+      --gold-deep: oklch(0.57 0.12 80);
+      --red: oklch(0.68 0.16 25);
+      --blue: oklch(0.76 0.09 230);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --shadow: 0 18px 45px rgb(0 0 0 / .22);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--canvas); }
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 89% -12%, oklch(0.31 0.07 150 / .35), transparent 32rem),
+        radial-gradient(circle at -20% 30%, oklch(0.26 0.065 110 / .22), transparent 28rem),
+        var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    button { font: inherit; }
+    button, .card-choice { touch-action: manipulation; }
+    .skip-link { position: fixed; left: 12px; top: -80px; z-index: 10; padding: 10px 14px; color: #101a17; background: var(--gold); border-radius: var(--radius-sm); }
+    .skip-link:focus { top: 12px; }
+    .app { width: min(100%, 1120px); margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)); }
+    .layout { display: grid; gap: 12px; align-items: start; }
+    .panel { background: rgb(255 255 255 / .045); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .selection-panel { overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 10px; }
+    h2 { margin: 0; font-size: 15px; line-height: 1.25; letter-spacing: -.01em; }
+    .small-button { min-height: 34px; padding: 5px 9px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+    .small-button:active { transform: scale(.96); }
+    .selected-area { display: grid; gap: 8px; padding: 0 16px 12px; }
+    .selection-row { display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 7px; }
+    .selection-label { color: var(--muted); font-size: 12px; }
+    .card-slots { display: flex; flex-wrap: nowrap; gap: 5px; min-height: 42px; }
+    .chosen-card, .empty-slot {
+      display: inline-flex; align-items: center; justify-content: center; width: 37px; height: 42px; padding: 0; border-radius: 7px; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    .chosen-card { position: relative; color: #172019; background: var(--ink); box-shadow: 0 2px 0 rgb(0 0 0 / .18); cursor: pointer; }
+    .chosen-card.red { color: #b83e39; }
+    .chosen-card::after { content: "×"; position: absolute; right: 3px; top: 1px; color: #768078; font-size: 13px; font-weight: 500; }
+    .empty-slot { color: color-mix(in oklch, var(--muted), transparent 45%); border: 1px dashed color-mix(in oklch, var(--line), transparent 5%); font-size: 14px; font-weight: 600; }
+    .picker { padding: 5px 10px 12px; border-top: 1px solid rgb(255 255 255 / .045); }
+    .suit-group { display: grid; grid-template-columns: 27px 1fr; gap: 5px; align-items: center; padding: 3px 0; }
+    .suit-label { font-size: 17px; text-align: center; }
+    .suit-label.red { color: #f17b72; }
+    .card-grid { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 4px; }
+    .card-choice { min-width: 0; height: 31px; padding: 0; color: var(--ink); background: var(--surface-raised); border: 1px solid transparent; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 720; transition-property: transform, background-color, color, opacity; transition-duration: 140ms; transition-timing-function: cubic-bezier(.16,1,.3,1); }
+    .card-choice.red { color: #ff9288; }
+    .card-choice.taken { opacity: .23; cursor: not-allowed; }
+    .card-choice:active:not(:disabled) { transform: scale(.93); }
+    .card-choice:focus-visible, .small-button:focus-visible, .chosen-card:focus-visible { outline: 3px solid color-mix(in oklch, var(--gold), white 20%); outline-offset: 2px; }
+    .results-panel { padding: 14px 16px; }
+    .results-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .sort-toggle { display: inline-flex; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+    .sort-button { min-height: 28px; padding: 4px 8px; color: var(--muted); background: transparent; border: 0; cursor: pointer; font-size: 11px; font-weight: 670; }
+    .sort-button + .sort-button { border-left: 1px solid var(--line); }
+    .sort-button[aria-pressed="true"] { color: #182019; background: var(--gold); }
+    .sort-button:active { transform: scale(.96); }
+    .result-status { min-height: 18px; margin: 3px 0 9px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .result-status.running { color: var(--blue); }
+    .progress-wrap { display: none; margin: -2px 0 10px; }
+    .progress-wrap.visible { display: block; }
+    .compute-progress { width: 100%; height: 6px; appearance: none; overflow: hidden; background: var(--surface-soft); border: 0; border-radius: 999px; }
+    .compute-progress::-webkit-progress-bar { background: var(--surface-soft); }
+    .compute-progress::-webkit-progress-value { background: var(--blue); border-radius: 999px; }
+    .compute-progress::-moz-progress-bar { background: var(--blue); border-radius: 999px; }
+    .hand-list { display: grid; gap: 5px; }
+    .hand-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 45px; align-items: center; gap: 8px; min-width: 0; padding: 6px 0; }
+    .hand-name { overflow: hidden; color: var(--muted); font-size: 12px; font-weight: 620; white-space: nowrap; }
+    .probability-bar { height: 8px; overflow: hidden; background: var(--surface-soft); border-radius: 999px; }
+    .probability-fill { display: block; width: var(--probability); height: 100%; min-width: var(--minimum-bar, 0); background: var(--bar-color); border-radius: inherit; }
+    .hand-data { color: var(--ink); font-size: 13px; font-weight: 780; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .result-empty { padding: 9px 0 2px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .hidden { display: none !important; }
+    @media (hover: hover) { .card-choice:hover:not(:disabled) { color: #182019; background: var(--gold); transform: translateY(-1px); } .small-button:hover { color: var(--ink); background: rgb(255 255 255 / .06); } .chosen-card:hover { transform: translateY(-1px); } }
+    @media (min-width: 720px) { .app { padding: 24px 28px 40px; } .layout { grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr); } .results-panel { position: sticky; top: 16px; } }
+    @media (max-width: 390px) { .app { padding-left: 12px; padding-right: 12px; } .panel-header, .selected-area, .results-panel { padding-left: 12px; padding-right: 12px; } .picker { padding-left: 7px; padding-right: 7px; } .suit-group { grid-template-columns: 24px 1fr; gap: 3px; } .card-grid { gap: 3px; } .card-choice { height: 29px; font-size: 11px; } .selection-row { grid-template-columns: 53px 1fr; gap: 5px; } .card-slots { gap: 4px; } .chosen-card, .empty-slot { width: 36px; height: 40px; font-size: 14px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到计算器</a>
+  <main id="main-content" class="app">
+    <div class="layout">
+      <section class="panel selection-panel" aria-labelledby="selection-title">
+        <div class="panel-header">
+          <h2 id="selection-title">输入</h2>
+          <button id="clearButton" class="small-button" type="button">清空全部</button>
+        </div>
+        <div class="selected-area">
+          <div class="selection-row"><span class="selection-label">我的底牌</span><div id="holeSlots" class="card-slots" aria-label="已选底牌"></div></div>
+          <div class="selection-row"><span class="selection-label">公共牌</span><div id="boardSlots" class="card-slots" aria-label="已选公共牌"></div></div>
+        </div>
+        <div id="cardPicker" class="picker" aria-label="选择一张扑克牌"></div>
+      </section>
+
+      <section class="panel results-panel" aria-labelledby="results-title" aria-live="polite">
+        <div class="results-heading">
+          <h2 id="results-title">结果</h2>
+          <div class="sort-toggle" aria-label="结果排序方式">
+            <button id="sortByProbability" class="sort-button" type="button" aria-pressed="true">按概率</button>
+            <button id="sortByHand" class="sort-button" type="button" aria-pressed="false">按牌型</button>
+          </div>
+        </div>
+        <p id="resultStatus" class="result-status">选择两张底牌后自动计算。</p>
+        <div id="progressWrap" class="progress-wrap"><progress id="computeProgress" class="compute-progress" value="0" max="1"></progress></div>
+        <div id="resultEmpty" class="result-empty">等待牌面输入</div>
+        <div id="resultContent" class="hidden">
+          <div id="handList" class="hand-list"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+    const SUITS = [
+      { key: 's', symbol: '♠', name: '黑桃' }, { key: 'h', symbol: '♥', name: '红桃' },
+      { key: 'd', symbol: '♦', name: '方块' }, { key: 'c', symbol: '♣', name: '梅花' }
+    ];
+    const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+    const HANDS = [
+      { key: 8, name: '同花顺', color: 'oklch(0.78 0.13 85)' }, { key: 7, name: '四条', color: 'oklch(0.72 0.12 22)' },
+      { key: 6, name: '葫芦', color: 'oklch(0.70 0.1 315)' }, { key: 5, name: '同花', color: 'oklch(0.72 0.1 200)' },
+      { key: 4, name: '顺子', color: 'oklch(0.72 0.11 145)' }, { key: 3, name: '三条', color: 'oklch(0.74 0.12 65)' },
+      { key: 2, name: '两对', color: 'oklch(0.69 0.08 270)' }, { key: 1, name: '一对', color: 'oklch(0.68 0.06 155)' },
+      { key: 0, name: '高牌', color: 'oklch(0.61 0.015 155)' }
+    ];
+    const el = Object.fromEntries(['holeSlots','boardSlots','cardPicker','clearButton','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
+    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, sortMode = 'probability', latestResult = null;
+    const cardText = id => RANKS[id % 13] + SUITS[Math.floor(id / 13)].symbol;
+    const isRed = id => { const suit = Math.floor(id / 13); return suit === 1 || suit === 2; };
+    const inputIsValid = () => hole.length === 2 && [0,3,4,5].includes(board.length);
+    function stopCalculation() { if (worker) { worker.terminate(); worker = null; } if (workerUrl) { URL.revokeObjectURL(workerUrl); workerUrl = null; } calculating = false; el.progressWrap.classList.remove('visible'); }
+
+    function cardButton(id) {
+      const button = document.createElement('button');
+      const taken = hole.includes(id) || board.includes(id);
+      button.type = 'button'; button.className = 'card-choice' + (isRed(id) ? ' red' : '') + (taken ? ' taken' : '');
+      button.disabled = taken; button.textContent = RANKS[id % 13]; button.setAttribute('aria-label', cardText(id) + (taken ? '，已选择' : ''));
+      button.addEventListener('click', () => addCard(id)); return button;
+    }
+    function chosenButton(id, target) {
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'chosen-card' + (isRed(id) ? ' red' : ''); button.textContent = cardText(id); button.title = '移除 ' + cardText(id); button.setAttribute('aria-label', '移除 ' + cardText(id));
+      button.addEventListener('click', () => { stopCalculation(); if (target === 'hole') hole = hole.filter(x => x !== id); else board = board.filter(x => x !== id); refresh(); queueCalculation(); }); return button;
+    }
+    function emptySlots(count) { const frag = document.createDocumentFragment(); for (let i=0;i<count;i++) { const slot=document.createElement('span'); slot.className='empty-slot'; slot.textContent='+'; frag.append(slot); } return frag; }
+    function refresh() {
+      el.holeSlots.replaceChildren(...hole.map(id => chosenButton(id,'hole'))); if (hole.length < 2) el.holeSlots.append(emptySlots(2-hole.length));
+      el.boardSlots.replaceChildren(...board.map(id => chosenButton(id,'board'))); if (board.length < 5) el.boardSlots.append(emptySlots(5-board.length));
+      const pickerFrag = document.createDocumentFragment(); SUITS.forEach((s, suitIndex) => { const group=document.createElement('div'); group.className='suit-group'; const label=document.createElement('span'); label.className='suit-label' + ((suitIndex === 1 || suitIndex === 2) ? ' red' : ''); label.textContent=s.symbol; label.title=s.name; const grid=document.createElement('div'); grid.className='card-grid'; RANKS.forEach((_, rankIndex) => grid.append(cardButton(suitIndex * 13 + rankIndex))); group.append(label,grid); pickerFrag.append(group); }); el.cardPicker.replaceChildren(pickerFrag);
+      if (!calculating) { latestResult = null; el.resultContent.classList.add('hidden'); el.resultEmpty.classList.remove('hidden'); el.resultEmpty.textContent = hole.length < 2 ? '等待两张底牌' : [1,2].includes(board.length) ? '继续选择公共牌' : '准备计算'; }
+    }
+    function addCard(id) { if (hole.includes(id) || board.includes(id)) return; stopCalculation(); if (hole.length < 2) hole.push(id); else if (board.length < 5) board.push(id); else return; refresh(); queueCalculation(); }
+    function renderResults(data) {
+      latestResult = data; const { counts, total } = data;
+      const handProbabilities = HANDS.map(hand => ({ hand, pct: counts[hand.key] / total * 100 }));
+      handProbabilities.sort(sortMode === 'probability' ? (a,b) => b.pct - a.pct || b.hand.key - a.hand.key : (a,b) => b.hand.key - a.hand.key);
+      const rows = handProbabilities.map(({hand,pct}) => { const row=document.createElement('div'); row.className='hand-row'; row.innerHTML = `<span class="hand-name">${hand.name}</span><span class="probability-bar" aria-hidden="true"><span class="probability-fill" style="--probability:${pct}%;--bar-color:${hand.color}"></span></span><span class="hand-data">${pct.toFixed(1)}%</span>`; return row; });
+      el.handList.replaceChildren(...rows); el.resultEmpty.classList.add('hidden'); el.resultContent.classList.remove('hidden'); el.resultStatus.textContent = ''; calculating=false;
+    }
+    function workerSource() { return `
+      const HAND={HIGH_CARD:0,ONE_PAIR:1,TWO_PAIR:2,THREE_OF_A_KIND:3,STRAIGHT:4,FLUSH:5,FULL_HOUSE:6,FOUR_OF_A_KIND:7,STRAIGHT_FLUSH:8};
+      const rankCounts=new Uint8Array(15), suitCounts=new Uint8Array(4), suitMasks=new Uint16Array(4);
+      function hasStraight(mask){ if(mask&(1<<14)) mask|=(1<<1); for(let high=14;high>=5;high--){ const need=(1<<high)|(1<<(high-1))|(1<<(high-2))|(1<<(high-3))|(1<<(high-4)); if((mask&need)===need)return true; } return false; }
+      function classify(cards, length){ rankCounts.fill(0); suitCounts.fill(0); suitMasks.fill(0); let allMask=0; for(let i=0;i<length;i++){const id=cards[i], rank=(id%13)+2, suit=(id/13)|0, bit=1<<rank; rankCounts[rank]++;suitCounts[suit]++;suitMasks[suit]|=bit;allMask|=bit;} for(let s=0;s<4;s++)if(suitCounts[s]>=5&&hasStraight(suitMasks[s]))return HAND.STRAIGHT_FLUSH; let triples=0,pairs=0;for(let r=2;r<=14;r++){const c=rankCounts[r];if(c===4)return HAND.FOUR_OF_A_KIND;if(c>=3)triples++;if(c>=2)pairs++;}if(triples>=2||(triples>=1&&pairs>=2))return HAND.FULL_HOUSE;for(let s=0;s<4;s++)if(suitCounts[s]>=5)return HAND.FLUSH;if(hasStraight(allMask))return HAND.STRAIGHT;if(triples)return HAND.THREE_OF_A_KIND;if(pairs>=2)return HAND.TWO_PAIR;if(pairs)return HAND.ONE_PAIR;return HAND.HIGH_CARD; }
+      self.onmessage=e=>{const {known,missing,remaining,boardCount}=e.data, cards=new Int8Array(7), counts=new Uint32Array(9);for(let i=0;i<known.length;i++)cards[i]=known[i];let total=0,last=performance.now(),done=0;const emit=force=>{const now=performance.now();if(force||now-last>120){self.postMessage({type:'progress',done,totalEstimate:expected});last=now;}};const expected=missing===0?1:missing===1?remaining.length:missing===2?remaining.length*(remaining.length-1)/2:2118760;
+      if(missing===0){counts[classify(cards,known.length)]++;total=1;}
+      else if(missing===1){for(let a=0;a<remaining.length;a++){cards[known.length]=remaining[a];counts[classify(cards,known.length+1)]++;total++;done++;emit(false);}}
+      else if(missing===2){for(let a=0;a<remaining.length-1;a++)for(let b=a+1;b<remaining.length;b++){cards[known.length]=remaining[a];cards[known.length+1]=remaining[b];counts[classify(cards,known.length+2)]++;total++;done++;emit(false);}}
+      else {const n=remaining.length;for(let a=0;a<n-4;a++)for(let b=a+1;b<n-3;b++)for(let c=b+1;c<n-2;c++)for(let d=c+1;d<n-1;d++)for(let f=d+1;f<n;f++){cards[2]=remaining[a];cards[3]=remaining[b];cards[4]=remaining[c];cards[5]=remaining[d];cards[6]=remaining[f];counts[classify(cards,7)]++;total++;done++;emit(false);}}
+      self.postMessage({type:'done',counts:Array.from(counts),total,boardCount});};
+    `; }
+    function queueCalculation() { if (!inputIsValid()) return; window.setTimeout(calculate, 0); }
+    function calculate() {
+      if (!inputIsValid() || calculating) return; calculating=true; el.clearButton.disabled=false; el.resultContent.classList.add('hidden'); el.resultEmpty.classList.remove('hidden'); el.resultEmpty.textContent='计算中'; el.resultStatus.textContent=''; el.resultStatus.className='result-status running'; el.progressWrap.classList.add('visible'); el.computeProgress.value=0;
+      const start=performance.now(), used=new Set([...hole,...board]), remaining=[]; for(let id=0;id<52;id++)if(!used.has(id))remaining.push(id);
+      const blob=new Blob([workerSource()],{type:'text/javascript'}); workerUrl=URL.createObjectURL(blob); worker=new Worker(workerUrl); worker.onmessage=event=>{const data=event.data;if(data.type==='progress'){el.computeProgress.value=data.done/data.totalEstimate;return;} if(data.type==='done'){data.duration=performance.now()-start; finishWorker(); renderResults(data);}}; worker.onerror=()=>{finishWorker(); el.resultStatus.textContent='无法计算'; el.resultStatus.className='result-status';}; worker.postMessage({known:[...hole,...board],missing:5-board.length,remaining,boardCount:board.length});
+    }
+    function finishWorker(){ if(worker){worker.terminate();worker=null;} if(workerUrl){URL.revokeObjectURL(workerUrl);workerUrl=null;} calculating=false; el.progressWrap.classList.remove('visible'); }
+    function setSortMode(mode) { sortMode = mode; el.sortByProbability.setAttribute('aria-pressed', String(mode === 'probability')); el.sortByHand.setAttribute('aria-pressed', String(mode === 'hand')); if (latestResult) renderResults(latestResult); }
+    el.clearButton.addEventListener('click',()=>{stopCalculation();hole=[];board=[];refresh();});
+    el.sortByProbability.addEventListener('click',()=>setSortMode('probability'));
+    el.sortByHand.addEventListener('click',()=>setSortMode('hand'));
+    refresh();
+  })();
+  </script>
+</body>
+</html>
