@@ -23,6 +23,19 @@
       --radius-lg: 22px;
       --shadow: 0 18px 45px rgb(0 0 0 / .22);
     }
+    html[data-theme="light"] {
+      --canvas: oklch(0.96 0.012 105);
+      --surface: oklch(0.985 0.006 105);
+      --surface-raised: oklch(0.93 0.014 105);
+      --surface-soft: oklch(0.88 0.018 105);
+      --ink: oklch(0.24 0.028 155);
+      --muted: oklch(0.48 0.035 155);
+      --line: oklch(0.74 0.028 155 / .9);
+      --gold: oklch(0.73 0.13 84);
+      --gold-deep: oklch(0.53 0.11 80);
+      --blue: oklch(0.55 0.105 230);
+      --shadow: 0 14px 34px rgb(35 56 42 / .12);
+    }
 
     * { box-sizing: border-box; }
     html { background: var(--canvas); }
@@ -38,6 +51,12 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+    html[data-theme="light"] body {
+      background:
+        radial-gradient(circle at 92% -12%, oklch(0.9 0.07 130 / .4), transparent 30rem),
+        radial-gradient(circle at -20% 30%, oklch(0.91 0.07 90 / .32), transparent 28rem),
+        var(--canvas);
+    }
     button { font: inherit; }
     button, .card-choice { touch-action: manipulation; }
     .skip-link { position: fixed; left: 12px; top: -80px; z-index: 10; padding: 10px 14px; color: #101a17; background: var(--gold); border-radius: var(--radius-sm); }
@@ -47,10 +66,13 @@
     .panel { background: rgb(255 255 255 / .045); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
     .selection-panel { overflow: hidden; }
     .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 10px; }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
     h2 { margin: 0; font-size: 15px; line-height: 1.25; letter-spacing: -.01em; }
     .small-button { min-height: 34px; padding: 5px 9px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
     .small-button:active { transform: scale(.96); }
-    .selected-area { display: grid; gap: 8px; padding: 0 16px 12px; }
+    .theme-button { width: 34px; height: 34px; padding: 0; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; font-size: 17px; line-height: 1; }
+    .theme-button:active { transform: scale(.96); }
+    .selected-area { display: grid; gap: 8px; padding: 12px 16px; }
     .selection-row { display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 7px; }
     .selection-label { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; }
     .privacy-button { display: inline-grid; width: 26px; height: 26px; padding: 0; place-items: center; color: var(--muted); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
@@ -60,28 +82,31 @@
     .eye-icon { position: relative; display: block; width: 16px; height: 10px; border: 1.7px solid currentColor; border-radius: 100% / 90%; }
     .eye-icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: currentColor; border-radius: 50%; transform: translate(-50%, -50%); }
     .privacy-button[aria-pressed="true"] .eye-icon::before { content: ""; position: absolute; z-index: 1; left: -3px; top: 3px; width: 19px; height: 1.7px; background: var(--gold); transform: rotate(-32deg); transform-origin: center; }
-    .card-slots { display: flex; flex-wrap: nowrap; gap: 5px; min-height: 42px; }
+    .card-slots { display: flex; flex-wrap: nowrap; align-items: center; gap: 5px; min-height: 42px; }
     .chosen-card, .empty-slot {
       display: inline-flex; align-items: center; justify-content: center; width: 37px; height: 42px; padding: 0; border-radius: 7px; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
     }
     .chosen-card { position: relative; color: #172019; background: var(--ink); box-shadow: 0 2px 0 rgb(0 0 0 / .18); cursor: pointer; }
     .chosen-card.red { color: #b83e39; }
     .chosen-card::after { content: "×"; position: absolute; right: 3px; top: 1px; color: #768078; font-size: 13px; font-weight: 500; }
-    .chosen-card.private-card { color: var(--gold); background: var(--surface-soft); border: 1px solid color-mix(in oklch, var(--gold), transparent 75%); }
+    .chosen-card.private-card { color: var(--gold); background-color: var(--surface-soft); background-image: radial-gradient(circle at 25% 25%, color-mix(in oklch, var(--gold), transparent 76%) 0 1px, transparent 1.5px), radial-gradient(circle at 75% 75%, color-mix(in oklch, var(--gold), transparent 82%) 0 1px, transparent 1.5px), repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in oklch, var(--gold), transparent 78%) 4px 6px), repeating-linear-gradient(-45deg, transparent 0 4px, color-mix(in oklch, var(--gold), transparent 84%) 4px 6px); background-size: 8px 8px, 8px 8px, auto, auto; border: 1px solid color-mix(in oklch, var(--gold), transparent 55%); box-shadow: inset 0 0 0 3px color-mix(in oklch, var(--gold), transparent 85%), 0 2px 0 rgb(0 0 0 / .18); }
+    .chosen-card.just-chosen { animation: deal-in 260ms cubic-bezier(.16,1,.3,1); }
     .empty-slot { color: color-mix(in oklch, var(--muted), transparent 45%); border: 1px dashed color-mix(in oklch, var(--line), transparent 5%); font-size: 14px; font-weight: 600; }
-    .picker { padding: 5px 10px 12px; border-top: 1px solid rgb(255 255 255 / .045); }
+    .picker-prompt { margin: 0 16px 5px; color: var(--gold); font-size: 12px; font-weight: 680; }
+    .picker { margin: 0 8px; padding: 7px 10px 12px; background: rgb(0 0 0 / .11); border: 1px solid color-mix(in oklch, var(--line), white 18%); border-radius: var(--radius-md); box-shadow: 0 8px 18px rgb(0 0 0 / .16), inset 0 1px 9px rgb(0 0 0 / .12); }
     .suit-group { display: grid; grid-template-columns: 27px 1fr; gap: 5px; align-items: center; padding: 3px 0; }
     .suit-label { font-size: 17px; text-align: center; }
     .suit-label.red { color: #f17b72; }
     .card-grid { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 4px; }
-    .card-choice { min-width: 0; height: 31px; padding: 0; color: var(--ink); background: var(--surface-raised); border: 1px solid transparent; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 720; transition-property: transform, background-color, color, opacity; transition-duration: 140ms; transition-timing-function: cubic-bezier(.16,1,.3,1); }
+    .card-choice { min-width: 0; height: 31px; padding: 0; color: var(--ink); background: color-mix(in oklch, var(--surface-raised), white 3%); border: 1px solid color-mix(in oklch, var(--line), white 12%); border-radius: 5px; box-shadow: 0 2px 0 rgb(0 0 0 / .22); cursor: pointer; font-size: 12px; font-weight: 720; transition-property: transform, background-color, color, opacity; transition-duration: 140ms; transition-timing-function: cubic-bezier(.16,1,.3,1); }
     .card-choice.red { color: #ff9288; }
-    .card-choice.taken { opacity: .23; cursor: not-allowed; }
+    .card-choice.taken { opacity: .23; box-shadow: none; cursor: not-allowed; }
     .card-choice.private-taken { opacity: 1; cursor: default; }
-    .card-choice:active:not(:disabled) { transform: scale(.93); }
-    .card-choice:focus-visible, .small-button:focus-visible, .chosen-card:focus-visible { outline: 3px solid color-mix(in oklch, var(--gold), white 20%); outline-offset: 2px; }
+    .card-choice:active:not(:disabled) { transform: translateY(1px) scale(.93); }
+    .card-choice:focus-visible, .small-button:focus-visible, .theme-button:focus-visible, .chosen-card:focus-visible { outline: 3px solid color-mix(in oklch, var(--gold), white 20%); outline-offset: 2px; }
     .results-panel { padding: 14px 16px; }
-    .results-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .results-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .results-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
     .sort-toggle { display: inline-flex; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-sm); }
     .sort-button { min-height: 28px; padding: 4px 8px; color: var(--muted); background: transparent; border: 0; cursor: pointer; font-size: 11px; font-weight: 670; }
     .sort-button + .sort-button { border-left: 1px solid var(--line); }
@@ -96,16 +121,23 @@
     .compute-progress::-webkit-progress-value { background: var(--blue); border-radius: 999px; }
     .compute-progress::-moz-progress-bar { background: var(--blue); border-radius: 999px; }
     .hand-list { display: grid; gap: 5px; }
-    .hand-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 45px; align-items: center; gap: 8px; min-width: 0; padding: 6px 0; }
-    .hand-name { overflow: hidden; color: var(--muted); font-size: 12px; font-weight: 620; white-space: nowrap; }
+    .hand-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) 45px; align-items: center; gap: 8px; min-width: 0; padding: 6px 0; }
+    .hand-name { display: flex; align-items: center; gap: 5px; overflow: hidden; color: var(--muted); font-size: 12px; font-weight: 620; white-space: nowrap; }
+    .hand-strength { display: inline-grid; flex: none; width: 19px; height: 19px; place-items: center; color: var(--gold); background: color-mix(in oklch, var(--gold), transparent 88%); border: 1px solid color-mix(in oklch, var(--gold), transparent 62%); border-radius: 5px; font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
     .probability-bar { height: 8px; overflow: hidden; background: var(--surface-soft); border-radius: 999px; }
     .probability-fill { display: block; width: var(--probability); height: 100%; min-width: var(--minimum-bar, 0); background: var(--bar-color); border-radius: inherit; }
     .hand-data { color: var(--ink); font-size: 13px; font-weight: 780; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .result-empty { padding: 9px 0 2px; color: var(--muted); font-size: 12px; line-height: 1.6; }
     .hidden { display: none !important; }
-    @media (hover: hover) { .card-choice:hover:not(:disabled) { color: #182019; background: var(--gold); transform: translateY(-1px); } .small-button:hover { color: var(--ink); background: rgb(255 255 255 / .06); } .chosen-card:hover { transform: translateY(-1px); } }
+    html[data-theme="light"] .panel { background: rgb(255 255 255 / .82); }
+    html[data-theme="light"] .picker { background: rgb(24 48 34 / .035); box-shadow: 0 8px 18px rgb(24 48 34 / .09), inset 0 1px 9px rgb(24 48 34 / .05); }
+    html[data-theme="light"] .chosen-card { color: var(--ink); background: #fff; box-shadow: 0 2px 0 rgb(30 50 38 / .15); }
+    html[data-theme="light"] .chosen-card.red { color: #b83e39; }
+    html[data-theme="light"] .chosen-card.private-card { color: var(--gold-deep); background-color: var(--surface-raised); }
+    @keyframes deal-in { from { opacity: .25; transform: translateY(8px) scale(.82); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (hover: hover) { .card-choice:hover:not(:disabled) { color: #182019; background: var(--gold); transform: translateY(-2px); } .small-button:hover, .theme-button:hover { color: var(--ink); background: rgb(255 255 255 / .06); } .chosen-card:hover { transform: translateY(-1px); } }
     @media (min-width: 720px) { .app { padding: 24px 28px 40px; } .layout { grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr); } .results-panel { position: sticky; top: 16px; } }
-    @media (max-width: 390px) { .app { padding-left: 12px; padding-right: 12px; } .panel-header, .selected-area, .results-panel { padding-left: 12px; padding-right: 12px; } .picker { padding-left: 7px; padding-right: 7px; } .suit-group { grid-template-columns: 24px 1fr; gap: 3px; } .card-grid { gap: 3px; } .card-choice { height: 29px; font-size: 11px; } .selection-row { grid-template-columns: 53px 1fr; gap: 5px; } .card-slots { gap: 4px; } .chosen-card, .empty-slot { width: 36px; height: 40px; font-size: 14px; } }
+    @media (max-width: 390px) { .app { padding-left: 12px; padding-right: 12px; } .panel-header, .selected-area, .results-panel { padding-left: 12px; padding-right: 12px; } .picker-prompt { margin-left: 12px; margin-right: 12px; } .picker { margin-left: 6px; margin-right: 6px; padding-left: 7px; padding-right: 7px; } .suit-group { grid-template-columns: 24px 1fr; gap: 3px; } .card-grid { gap: 3px; } .card-choice { height: 29px; font-size: 11px; } .selection-row { grid-template-columns: 53px 1fr; gap: 5px; } .card-slots { gap: 4px; } .chosen-card, .empty-slot { width: 36px; height: 40px; font-size: 14px; } .hand-row { grid-template-columns: 86px minmax(0, 1fr) 45px; gap: 6px; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
 </head>
@@ -116,21 +148,31 @@
       <section class="panel selection-panel" aria-labelledby="selection-title">
         <div class="panel-header">
           <h2 id="selection-title">德扑概率计算</h2>
-          <button id="clearButton" class="small-button" type="button">清空全部</button>
+          <div class="header-actions">
+            <button id="themeToggle" class="theme-button" type="button" aria-pressed="false" aria-label="切换至白天模式" title="切换至白天模式">☀</button>
+            <button id="clearButton" class="small-button" type="button">清空全部</button>
+          </div>
         </div>
+        <p id="pickerPrompt" class="picker-prompt">点击下方任意牌，选择你的两张底牌</p>
+        <div id="cardPicker" class="picker" aria-label="选择一张扑克牌"></div>
         <div class="selected-area">
-          <div class="selection-row"><span class="selection-label">我的底牌 <button id="privacyButton" class="privacy-button" type="button" aria-pressed="true" aria-label="显示底牌" title="显示底牌"><span class="eye-icon" aria-hidden="true"></span></button></span><div id="holeSlots" class="card-slots" aria-label="已选底牌"></div></div>
+          <div class="selection-row"><span class="selection-label">我的底牌</span><div id="holeSlots" class="card-slots" aria-label="已选底牌"><button id="privacyButton" class="privacy-button" type="button" aria-pressed="true" aria-label="显示底牌" title="显示底牌"><span class="eye-icon" aria-hidden="true"></span></button></div></div>
           <div class="selection-row"><span class="selection-label">公共牌</span><div id="boardSlots" class="card-slots" aria-label="已选公共牌"></div></div>
         </div>
-        <div id="cardPicker" class="picker" aria-label="选择一张扑克牌"></div>
       </section>
 
       <section class="panel results-panel" aria-labelledby="results-title" aria-live="polite">
         <div class="results-heading">
           <h2 id="results-title">结果</h2>
-          <div class="sort-toggle" aria-label="结果排序方式">
-            <button id="sortByProbability" class="sort-button" type="button" aria-pressed="true">按概率</button>
-            <button id="sortByHand" class="sort-button" type="button" aria-pressed="false">按牌型</button>
+          <div class="results-controls">
+            <div class="sort-toggle" aria-label="概率呈现方式">
+              <button id="showAtLeast" class="sort-button" type="button" aria-pressed="true">重叠</button>
+              <button id="showExact" class="sort-button" type="button" aria-pressed="false">互斥</button>
+            </div>
+            <div class="sort-toggle" aria-label="结果排序方式">
+              <button id="sortByProbability" class="sort-button" type="button" aria-pressed="true">按概率</button>
+              <button id="sortByHand" class="sort-button" type="button" aria-pressed="false">按牌型</button>
+            </div>
           </div>
         </div>
         <p id="resultStatus" class="result-status">选择两张底牌后自动计算。</p>
@@ -152,14 +194,12 @@
     ];
     const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     const HANDS = [
-      { key: 8, name: '同花顺', color: 'oklch(0.78 0.13 85)' }, { key: 7, name: '四条', color: 'oklch(0.72 0.12 22)' },
-      { key: 6, name: '葫芦', color: 'oklch(0.70 0.1 315)' }, { key: 5, name: '同花', color: 'oklch(0.72 0.1 200)' },
-      { key: 4, name: '顺子', color: 'oklch(0.72 0.11 145)' }, { key: 3, name: '三条', color: 'oklch(0.74 0.12 65)' },
-      { key: 2, name: '两对', color: 'oklch(0.69 0.08 270)' }, { key: 1, name: '一对', color: 'oklch(0.68 0.06 155)' },
-      { key: 0, name: '高牌', color: 'oklch(0.61 0.015 155)' }
+      { key: 9, name: '皇家同花顺' }, { key: 8, name: '同花顺' }, { key: 7, name: '四条' },
+      { key: 6, name: '葫芦' }, { key: 5, name: '同花' }, { key: 4, name: '顺子' },
+      { key: 3, name: '三条' }, { key: 2, name: '两对' }, { key: 1, name: '一对' }, { key: 0, name: '高牌' }
     ];
-    const el = Object.fromEntries(['holeSlots','boardSlots','cardPicker','clearButton','privacyButton','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
-    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, privacyEnabled = true, sortMode = 'probability', latestResult = null;
+    const el = Object.fromEntries(['holeSlots','boardSlots','pickerPrompt','cardPicker','clearButton','themeToggle','privacyButton','showExact','showAtLeast','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
+    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, privacyEnabled = true, recentlyChosen = null, themeMode = 'dark', resultMode = 'atLeast', sortMode = 'probability', latestResult = null;
     const cardText = id => RANKS[id % 13] + SUITS[Math.floor(id / 13)].symbol;
     const isRed = id => { const suit = Math.floor(id / 13); return suit === 1 || suit === 2; };
     const inputIsValid = () => hole.length === 2 && [0,3,4,5].includes(board.length);
@@ -174,30 +214,35 @@
     }
     function chosenButton(id, target) {
       const hidden = privacyEnabled && target === 'hole';
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'chosen-card' + (isRed(id) && !hidden ? ' red' : '') + (hidden ? ' private-card' : ''); button.textContent = hidden ? '••' : cardText(id); button.title = hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id); button.setAttribute('aria-label', hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id));
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'chosen-card' + (isRed(id) && !hidden ? ' red' : '') + (hidden ? ' private-card' : '') + (id === recentlyChosen ? ' just-chosen' : ''); button.textContent = hidden ? '?' : cardText(id); button.title = hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id); button.setAttribute('aria-label', hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id));
       button.addEventListener('click', () => { stopCalculation(); if (target === 'hole') hole = hole.filter(x => x !== id); else board = board.filter(x => x !== id); refresh(); queueCalculation(); }); return button;
     }
     function emptySlots(count) { const frag = document.createDocumentFragment(); for (let i=0;i<count;i++) { const slot=document.createElement('span'); slot.className='empty-slot'; slot.textContent='+'; frag.append(slot); } return frag; }
     function refresh(preserveResults = false) {
-      el.holeSlots.replaceChildren(...hole.map(id => chosenButton(id,'hole'))); if (hole.length < 2) el.holeSlots.append(emptySlots(2-hole.length));
+      el.holeSlots.replaceChildren(...hole.map(id => chosenButton(id,'hole'))); if (hole.length < 2) el.holeSlots.append(emptySlots(2-hole.length)); el.holeSlots.append(el.privacyButton);
       el.boardSlots.replaceChildren(...board.map(id => chosenButton(id,'board'))); if (board.length < 5) el.boardSlots.append(emptySlots(5-board.length));
+      el.pickerPrompt.textContent = hole.length < 2 ? '点击下方任意牌，选择你的两张底牌' : board.length < 5 ? '点击下方任意牌，添加公共牌' : '公共牌已齐，点击上方牌可移除';
       const pickerFrag = document.createDocumentFragment(); SUITS.forEach((s, suitIndex) => { const group=document.createElement('div'); group.className='suit-group'; const label=document.createElement('span'); label.className='suit-label' + ((suitIndex === 1 || suitIndex === 2) ? ' red' : ''); label.textContent=s.symbol; label.title=s.name; const grid=document.createElement('div'); grid.className='card-grid'; RANKS.forEach((_, rankIndex) => grid.append(cardButton(suitIndex * 13 + rankIndex))); group.append(label,grid); pickerFrag.append(group); }); el.cardPicker.replaceChildren(pickerFrag);
       if (!calculating && !preserveResults) { latestResult = null; el.resultContent.classList.add('hidden'); el.resultEmpty.classList.remove('hidden'); el.resultEmpty.textContent = hole.length < 2 ? '等待两张底牌' : [1,2].includes(board.length) ? '继续选择公共牌' : '准备计算'; }
     }
-    function addCard(id) { if (hole.includes(id) || board.includes(id)) return; stopCalculation(); if (hole.length < 2) hole.push(id); else if (board.length < 5) board.push(id); else return; refresh(); queueCalculation(); }
+    function addCard(id) { if (hole.includes(id) || board.includes(id)) return; stopCalculation(); if (hole.length < 2) hole.push(id); else if (board.length < 5) board.push(id); else return; recentlyChosen = id; refresh(); window.setTimeout(() => { recentlyChosen = null; }, 280); queueCalculation(); }
     function renderResults(data) {
       latestResult = data; const { counts, total } = data;
-      const handProbabilities = HANDS.map(hand => ({ hand, pct: counts[hand.key] / total * 100 }));
+      const handProbabilities = HANDS.filter(hand => hand.key !== 0).map(hand => {
+        const count = resultMode === 'exact' ? counts[hand.key] : counts.reduce((sum, value, key) => sum + (key >= hand.key ? value : 0), 0);
+        return { hand, pct: count / total * 100 };
+      });
       handProbabilities.sort(sortMode === 'probability' ? (a,b) => b.pct - a.pct || b.hand.key - a.hand.key : (a,b) => b.hand.key - a.hand.key);
-      const rows = handProbabilities.map(({hand,pct}) => { const row=document.createElement('div'); row.className='hand-row'; row.innerHTML = `<span class="hand-name">${hand.name}</span><span class="probability-bar" aria-hidden="true"><span class="probability-fill" style="--probability:${pct}%;--bar-color:${hand.color}"></span></span><span class="hand-data">${pct.toFixed(1)}%</span>`; return row; });
-      el.handList.replaceChildren(...rows); el.resultEmpty.classList.add('hidden'); el.resultContent.classList.remove('hidden'); el.resultStatus.textContent = ''; calculating=false;
+      const rows = handProbabilities.map(({hand,pct}) => { const row=document.createElement('div'); row.className='hand-row'; row.innerHTML = `<span class="hand-name" title="牌型强度 ${hand.key + 1} / 10"><span class="hand-strength">${hand.key + 1}</span>${hand.name}</span><span class="probability-bar" aria-hidden="true"><span class="probability-fill" style="--probability:${pct}%;--bar-color:var(--gold)"></span></span><span class="hand-data">${pct.toFixed(1)}%</span>`; return row; });
+      el.handList.replaceChildren(...rows); el.resultEmpty.classList.add('hidden'); el.resultContent.classList.remove('hidden'); el.resultStatus.textContent = resultMode === 'exact' ? '互斥概率，合计 100%' : '重叠概率，表示至少达到该牌力'; calculating=false;
     }
     function workerSource() { return `
-      const HAND={HIGH_CARD:0,ONE_PAIR:1,TWO_PAIR:2,THREE_OF_A_KIND:3,STRAIGHT:4,FLUSH:5,FULL_HOUSE:6,FOUR_OF_A_KIND:7,STRAIGHT_FLUSH:8};
+      const HAND={HIGH_CARD:0,ONE_PAIR:1,TWO_PAIR:2,THREE_OF_A_KIND:3,STRAIGHT:4,FLUSH:5,FULL_HOUSE:6,FOUR_OF_A_KIND:7,STRAIGHT_FLUSH:8,ROYAL_FLUSH:9};
+      const ROYAL_MASK=(1<<10)|(1<<11)|(1<<12)|(1<<13)|(1<<14);
       const rankCounts=new Uint8Array(15), suitCounts=new Uint8Array(4), suitMasks=new Uint16Array(4);
       function hasStraight(mask){ if(mask&(1<<14)) mask|=(1<<1); for(let high=14;high>=5;high--){ const need=(1<<high)|(1<<(high-1))|(1<<(high-2))|(1<<(high-3))|(1<<(high-4)); if((mask&need)===need)return true; } return false; }
-      function classify(cards, length){ rankCounts.fill(0); suitCounts.fill(0); suitMasks.fill(0); let allMask=0; for(let i=0;i<length;i++){const id=cards[i], rank=(id%13)+2, suit=(id/13)|0, bit=1<<rank; rankCounts[rank]++;suitCounts[suit]++;suitMasks[suit]|=bit;allMask|=bit;} for(let s=0;s<4;s++)if(suitCounts[s]>=5&&hasStraight(suitMasks[s]))return HAND.STRAIGHT_FLUSH; let triples=0,pairs=0;for(let r=2;r<=14;r++){const c=rankCounts[r];if(c===4)return HAND.FOUR_OF_A_KIND;if(c>=3)triples++;if(c>=2)pairs++;}if(triples>=2||(triples>=1&&pairs>=2))return HAND.FULL_HOUSE;for(let s=0;s<4;s++)if(suitCounts[s]>=5)return HAND.FLUSH;if(hasStraight(allMask))return HAND.STRAIGHT;if(triples)return HAND.THREE_OF_A_KIND;if(pairs>=2)return HAND.TWO_PAIR;if(pairs)return HAND.ONE_PAIR;return HAND.HIGH_CARD; }
-      self.onmessage=e=>{const {known,missing,remaining,boardCount}=e.data, cards=new Int8Array(7), counts=new Uint32Array(9);for(let i=0;i<known.length;i++)cards[i]=known[i];let total=0,last=performance.now(),done=0;const emit=force=>{const now=performance.now();if(force||now-last>120){self.postMessage({type:'progress',done,totalEstimate:expected});last=now;}};const expected=missing===0?1:missing===1?remaining.length:missing===2?remaining.length*(remaining.length-1)/2:2118760;
+      function classify(cards, length){ rankCounts.fill(0); suitCounts.fill(0); suitMasks.fill(0); let allMask=0; for(let i=0;i<length;i++){const id=cards[i], rank=(id%13)+2, suit=(id/13)|0, bit=1<<rank; rankCounts[rank]++;suitCounts[suit]++;suitMasks[suit]|=bit;allMask|=bit;} for(let s=0;s<4;s++)if(suitCounts[s]>=5&&hasStraight(suitMasks[s]))return (suitMasks[s]&ROYAL_MASK)===ROYAL_MASK?HAND.ROYAL_FLUSH:HAND.STRAIGHT_FLUSH; let triples=0,pairs=0;for(let r=2;r<=14;r++){const c=rankCounts[r];if(c===4)return HAND.FOUR_OF_A_KIND;if(c>=3)triples++;if(c>=2)pairs++;}if(triples>=2||(triples>=1&&pairs>=2))return HAND.FULL_HOUSE;for(let s=0;s<4;s++)if(suitCounts[s]>=5)return HAND.FLUSH;if(hasStraight(allMask))return HAND.STRAIGHT;if(triples)return HAND.THREE_OF_A_KIND;if(pairs>=2)return HAND.TWO_PAIR;if(pairs)return HAND.ONE_PAIR;return HAND.HIGH_CARD; }
+      self.onmessage=e=>{const {known,missing,remaining,boardCount}=e.data, cards=new Int8Array(7), counts=new Uint32Array(10);for(let i=0;i<known.length;i++)cards[i]=known[i];let total=0,last=performance.now(),done=0;const emit=force=>{const now=performance.now();if(force||now-last>120){self.postMessage({type:'progress',done,totalEstimate:expected});last=now;}};const expected=missing===0?1:missing===1?remaining.length:missing===2?remaining.length*(remaining.length-1)/2:2118760;
       if(missing===0){counts[classify(cards,known.length)]++;total=1;}
       else if(missing===1){for(let a=0;a<remaining.length;a++){cards[known.length]=remaining[a];counts[classify(cards,known.length+1)]++;total++;done++;emit(false);}}
       else if(missing===2){for(let a=0;a<remaining.length-1;a++)for(let b=a+1;b<remaining.length;b++){cards[known.length]=remaining[a];cards[known.length+1]=remaining[b];counts[classify(cards,known.length+2)]++;total++;done++;emit(false);}}
@@ -212,10 +257,17 @@
     }
     function finishWorker(){ if(worker){worker.terminate();worker=null;} if(workerUrl){URL.revokeObjectURL(workerUrl);workerUrl=null;} calculating=false; el.progressWrap.classList.remove('visible'); }
     function setSortMode(mode) { sortMode = mode; el.sortByProbability.setAttribute('aria-pressed', String(mode === 'probability')); el.sortByHand.setAttribute('aria-pressed', String(mode === 'hand')); if (latestResult) renderResults(latestResult); }
+    function setResultMode(mode) { resultMode = mode; el.showExact.setAttribute('aria-pressed', String(mode === 'exact')); el.showAtLeast.setAttribute('aria-pressed', String(mode === 'atLeast')); if (latestResult) renderResults(latestResult); }
+    function applyTheme(mode) { document.documentElement.dataset.theme = mode; const isLight = mode === 'light'; el.themeToggle.textContent = isLight ? '☾' : '☀'; el.themeToggle.setAttribute('aria-pressed', String(isLight)); el.themeToggle.setAttribute('aria-label', isLight ? '切换至夜间模式' : '切换至白天模式'); el.themeToggle.title = isLight ? '切换至夜间模式' : '切换至白天模式'; document.querySelector('meta[name="theme-color"]').content = isLight ? '#f4f4eb' : '#101a17'; }
     el.clearButton.addEventListener('click',()=>{stopCalculation();hole=[];board=[];refresh();});
+    el.themeToggle.addEventListener('click',()=>{ themeMode = themeMode === 'light' ? 'dark' : 'light'; applyTheme(themeMode); try { localStorage.setItem('texas-holdem-theme', themeMode); } catch {} });
     el.privacyButton.addEventListener('click',()=>{ privacyEnabled = !privacyEnabled; el.privacyButton.setAttribute('aria-pressed', String(privacyEnabled)); el.privacyButton.setAttribute('aria-label', privacyEnabled ? '显示底牌' : '隐藏底牌'); el.privacyButton.title = privacyEnabled ? '显示底牌' : '隐藏底牌'; refresh(true); });
+    el.showExact.addEventListener('click',()=>setResultMode('exact'));
+    el.showAtLeast.addEventListener('click',()=>setResultMode('atLeast'));
     el.sortByProbability.addEventListener('click',()=>setSortMode('probability'));
     el.sortByHand.addEventListener('click',()=>setSortMode('hand'));
+    try { themeMode = localStorage.getItem('texas-holdem-theme') === 'light' ? 'light' : 'dark'; } catch {}
+    applyTheme(themeMode);
     refresh();
   })();
   </script>
