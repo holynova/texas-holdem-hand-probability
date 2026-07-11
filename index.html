@@ -52,7 +52,14 @@
     .small-button:active { transform: scale(.96); }
     .selected-area { display: grid; gap: 8px; padding: 0 16px 12px; }
     .selection-row { display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 7px; }
-    .selection-label { color: var(--muted); font-size: 12px; }
+    .selection-label { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; }
+    .privacy-button { display: inline-grid; width: 26px; height: 26px; padding: 0; place-items: center; color: var(--muted); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
+    .privacy-button[aria-pressed="true"] { color: var(--gold); background: rgb(255 255 255 / .06); }
+    .privacy-button:active { transform: scale(.92); }
+    .privacy-button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .eye-icon { position: relative; display: block; width: 16px; height: 10px; border: 1.7px solid currentColor; border-radius: 100% / 90%; }
+    .eye-icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: currentColor; border-radius: 50%; transform: translate(-50%, -50%); }
+    .privacy-button[aria-pressed="true"] .eye-icon::before { content: ""; position: absolute; z-index: 1; left: -3px; top: 3px; width: 19px; height: 1.7px; background: var(--gold); transform: rotate(-32deg); transform-origin: center; }
     .card-slots { display: flex; flex-wrap: nowrap; gap: 5px; min-height: 42px; }
     .chosen-card, .empty-slot {
       display: inline-flex; align-items: center; justify-content: center; width: 37px; height: 42px; padding: 0; border-radius: 7px; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
@@ -60,6 +67,7 @@
     .chosen-card { position: relative; color: #172019; background: var(--ink); box-shadow: 0 2px 0 rgb(0 0 0 / .18); cursor: pointer; }
     .chosen-card.red { color: #b83e39; }
     .chosen-card::after { content: "×"; position: absolute; right: 3px; top: 1px; color: #768078; font-size: 13px; font-weight: 500; }
+    .chosen-card.private-card { color: var(--gold); background: var(--surface-soft); border: 1px solid color-mix(in oklch, var(--gold), transparent 75%); }
     .empty-slot { color: color-mix(in oklch, var(--muted), transparent 45%); border: 1px dashed color-mix(in oklch, var(--line), transparent 5%); font-size: 14px; font-weight: 600; }
     .picker { padding: 5px 10px 12px; border-top: 1px solid rgb(255 255 255 / .045); }
     .suit-group { display: grid; grid-template-columns: 27px 1fr; gap: 5px; align-items: center; padding: 3px 0; }
@@ -69,6 +77,7 @@
     .card-choice { min-width: 0; height: 31px; padding: 0; color: var(--ink); background: var(--surface-raised); border: 1px solid transparent; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 720; transition-property: transform, background-color, color, opacity; transition-duration: 140ms; transition-timing-function: cubic-bezier(.16,1,.3,1); }
     .card-choice.red { color: #ff9288; }
     .card-choice.taken { opacity: .23; cursor: not-allowed; }
+    .card-choice.private-taken { opacity: 1; cursor: default; }
     .card-choice:active:not(:disabled) { transform: scale(.93); }
     .card-choice:focus-visible, .small-button:focus-visible, .chosen-card:focus-visible { outline: 3px solid color-mix(in oklch, var(--gold), white 20%); outline-offset: 2px; }
     .results-panel { padding: 14px 16px; }
@@ -106,11 +115,11 @@
     <div class="layout">
       <section class="panel selection-panel" aria-labelledby="selection-title">
         <div class="panel-header">
-          <h2 id="selection-title">输入</h2>
+          <h2 id="selection-title">德扑概率计算</h2>
           <button id="clearButton" class="small-button" type="button">清空全部</button>
         </div>
         <div class="selected-area">
-          <div class="selection-row"><span class="selection-label">我的底牌</span><div id="holeSlots" class="card-slots" aria-label="已选底牌"></div></div>
+          <div class="selection-row"><span class="selection-label">我的底牌 <button id="privacyButton" class="privacy-button" type="button" aria-pressed="true" aria-label="显示底牌" title="显示底牌"><span class="eye-icon" aria-hidden="true"></span></button></span><div id="holeSlots" class="card-slots" aria-label="已选底牌"></div></div>
           <div class="selection-row"><span class="selection-label">公共牌</span><div id="boardSlots" class="card-slots" aria-label="已选公共牌"></div></div>
         </div>
         <div id="cardPicker" class="picker" aria-label="选择一张扑克牌"></div>
@@ -149,8 +158,8 @@
       { key: 2, name: '两对', color: 'oklch(0.69 0.08 270)' }, { key: 1, name: '一对', color: 'oklch(0.68 0.06 155)' },
       { key: 0, name: '高牌', color: 'oklch(0.61 0.015 155)' }
     ];
-    const el = Object.fromEntries(['holeSlots','boardSlots','cardPicker','clearButton','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
-    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, sortMode = 'probability', latestResult = null;
+    const el = Object.fromEntries(['holeSlots','boardSlots','cardPicker','clearButton','privacyButton','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
+    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, privacyEnabled = true, sortMode = 'probability', latestResult = null;
     const cardText = id => RANKS[id % 13] + SUITS[Math.floor(id / 13)].symbol;
     const isRed = id => { const suit = Math.floor(id / 13); return suit === 1 || suit === 2; };
     const inputIsValid = () => hole.length === 2 && [0,3,4,5].includes(board.length);
@@ -158,21 +167,22 @@
 
     function cardButton(id) {
       const button = document.createElement('button');
-      const taken = hole.includes(id) || board.includes(id);
-      button.type = 'button'; button.className = 'card-choice' + (isRed(id) ? ' red' : '') + (taken ? ' taken' : '');
-      button.disabled = taken; button.textContent = RANKS[id % 13]; button.setAttribute('aria-label', cardText(id) + (taken ? '，已选择' : ''));
+      const hiddenHole = privacyEnabled && hole.includes(id), taken = hiddenHole || board.includes(id) || hole.includes(id);
+      button.type = 'button'; button.className = 'card-choice' + (isRed(id) ? ' red' : '') + (taken && !hiddenHole ? ' taken' : '') + (hiddenHole ? ' private-taken' : '');
+      button.disabled = taken; button.textContent = RANKS[id % 13]; button.setAttribute('aria-label', hiddenHole ? '已选择且已隐藏的底牌' : cardText(id) + (taken ? '，已选择' : ''));
       button.addEventListener('click', () => addCard(id)); return button;
     }
     function chosenButton(id, target) {
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'chosen-card' + (isRed(id) ? ' red' : ''); button.textContent = cardText(id); button.title = '移除 ' + cardText(id); button.setAttribute('aria-label', '移除 ' + cardText(id));
+      const hidden = privacyEnabled && target === 'hole';
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'chosen-card' + (isRed(id) && !hidden ? ' red' : '') + (hidden ? ' private-card' : ''); button.textContent = hidden ? '••' : cardText(id); button.title = hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id); button.setAttribute('aria-label', hidden ? '移除已隐藏底牌' : '移除 ' + cardText(id));
       button.addEventListener('click', () => { stopCalculation(); if (target === 'hole') hole = hole.filter(x => x !== id); else board = board.filter(x => x !== id); refresh(); queueCalculation(); }); return button;
     }
     function emptySlots(count) { const frag = document.createDocumentFragment(); for (let i=0;i<count;i++) { const slot=document.createElement('span'); slot.className='empty-slot'; slot.textContent='+'; frag.append(slot); } return frag; }
-    function refresh() {
+    function refresh(preserveResults = false) {
       el.holeSlots.replaceChildren(...hole.map(id => chosenButton(id,'hole'))); if (hole.length < 2) el.holeSlots.append(emptySlots(2-hole.length));
       el.boardSlots.replaceChildren(...board.map(id => chosenButton(id,'board'))); if (board.length < 5) el.boardSlots.append(emptySlots(5-board.length));
       const pickerFrag = document.createDocumentFragment(); SUITS.forEach((s, suitIndex) => { const group=document.createElement('div'); group.className='suit-group'; const label=document.createElement('span'); label.className='suit-label' + ((suitIndex === 1 || suitIndex === 2) ? ' red' : ''); label.textContent=s.symbol; label.title=s.name; const grid=document.createElement('div'); grid.className='card-grid'; RANKS.forEach((_, rankIndex) => grid.append(cardButton(suitIndex * 13 + rankIndex))); group.append(label,grid); pickerFrag.append(group); }); el.cardPicker.replaceChildren(pickerFrag);
-      if (!calculating) { latestResult = null; el.resultContent.classList.add('hidden'); el.resultEmpty.classList.remove('hidden'); el.resultEmpty.textContent = hole.length < 2 ? '等待两张底牌' : [1,2].includes(board.length) ? '继续选择公共牌' : '准备计算'; }
+      if (!calculating && !preserveResults) { latestResult = null; el.resultContent.classList.add('hidden'); el.resultEmpty.classList.remove('hidden'); el.resultEmpty.textContent = hole.length < 2 ? '等待两张底牌' : [1,2].includes(board.length) ? '继续选择公共牌' : '准备计算'; }
     }
     function addCard(id) { if (hole.includes(id) || board.includes(id)) return; stopCalculation(); if (hole.length < 2) hole.push(id); else if (board.length < 5) board.push(id); else return; refresh(); queueCalculation(); }
     function renderResults(data) {
@@ -203,6 +213,7 @@
     function finishWorker(){ if(worker){worker.terminate();worker=null;} if(workerUrl){URL.revokeObjectURL(workerUrl);workerUrl=null;} calculating=false; el.progressWrap.classList.remove('visible'); }
     function setSortMode(mode) { sortMode = mode; el.sortByProbability.setAttribute('aria-pressed', String(mode === 'probability')); el.sortByHand.setAttribute('aria-pressed', String(mode === 'hand')); if (latestResult) renderResults(latestResult); }
     el.clearButton.addEventListener('click',()=>{stopCalculation();hole=[];board=[];refresh();});
+    el.privacyButton.addEventListener('click',()=>{ privacyEnabled = !privacyEnabled; el.privacyButton.setAttribute('aria-pressed', String(privacyEnabled)); el.privacyButton.setAttribute('aria-label', privacyEnabled ? '显示底牌' : '隐藏底牌'); el.privacyButton.title = privacyEnabled ? '显示底牌' : '隐藏底牌'; refresh(true); });
     el.sortByProbability.addEventListener('click',()=>setSortMode('probability'));
     el.sortByHand.addEventListener('click',()=>setSortMode('hand'));
     refresh();
