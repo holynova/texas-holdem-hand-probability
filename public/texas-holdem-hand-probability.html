@@ -17,11 +17,9 @@
       --gold: oklch(0.83 0.135 86);
       --gold-deep: oklch(0.57 0.12 80);
       --red: oklch(0.68 0.16 25);
-      --blue: oklch(0.76 0.09 230);
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 22px;
-      --shadow: 0 18px 45px rgb(0 0 0 / .22);
     }
     html[data-theme="light"] {
       --canvas: oklch(0.96 0.012 105);
@@ -33,8 +31,6 @@
       --line: oklch(0.74 0.028 155 / .9);
       --gold: oklch(0.73 0.13 84);
       --gold-deep: oklch(0.53 0.11 80);
-      --blue: oklch(0.55 0.105 230);
-      --shadow: 0 14px 34px rgb(35 56 42 / .12);
     }
 
     * { box-sizing: border-box; }
@@ -63,7 +59,7 @@
     .skip-link:focus { top: 12px; }
     .app { width: min(100%, 1120px); margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)); }
     .layout { display: grid; gap: 12px; align-items: start; }
-    .panel { background: rgb(255 255 255 / .045); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .panel { background: rgb(255 255 255 / .045); border: 1px solid var(--line); border-radius: var(--radius-lg); }
     .selection-panel { overflow: hidden; }
     .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 10px; }
     .header-actions { display: flex; align-items: center; gap: 6px; }
@@ -91,9 +87,9 @@
     .chosen-card::after { content: "×"; position: absolute; right: 3px; top: 1px; color: #768078; font-size: 13px; font-weight: 500; }
     .chosen-card.private-card { color: var(--gold); background-color: var(--surface-soft); background-image: radial-gradient(circle at 25% 25%, color-mix(in oklch, var(--gold), transparent 76%) 0 1px, transparent 1.5px), radial-gradient(circle at 75% 75%, color-mix(in oklch, var(--gold), transparent 82%) 0 1px, transparent 1.5px), repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in oklch, var(--gold), transparent 78%) 4px 6px), repeating-linear-gradient(-45deg, transparent 0 4px, color-mix(in oklch, var(--gold), transparent 84%) 4px 6px); background-size: 8px 8px, 8px 8px, auto, auto; border: 1px solid color-mix(in oklch, var(--gold), transparent 55%); box-shadow: inset 0 0 0 3px color-mix(in oklch, var(--gold), transparent 85%), 0 2px 0 rgb(0 0 0 / .18); }
     .chosen-card.just-chosen { animation: deal-in 260ms cubic-bezier(.16,1,.3,1); }
-    .empty-slot { color: color-mix(in oklch, var(--muted), transparent 45%); border: 1px dashed color-mix(in oklch, var(--line), transparent 5%); font-size: 14px; font-weight: 600; }
+    .empty-slot { color: color-mix(in oklch, var(--muted), transparent 45%); border: 1px dashed color-mix(in oklch, var(--line), transparent 5%); font-size: 15px; font-weight: 600; }
     .picker-prompt { margin: 0 16px 5px; color: var(--gold); font-size: 12px; font-weight: 680; }
-    .picker { margin: 0 8px; padding: 7px 10px 12px; background: rgb(0 0 0 / .11); border: 1px solid color-mix(in oklch, var(--line), white 18%); border-radius: var(--radius-md); box-shadow: 0 8px 18px rgb(0 0 0 / .16), inset 0 1px 9px rgb(0 0 0 / .12); }
+    .picker { margin: 0 8px; padding: 7px 10px 12px; background: rgb(0 0 0 / .11); border: 1px solid color-mix(in oklch, var(--line), white 18%); border-radius: var(--radius-md); }
     .suit-group { display: grid; grid-template-columns: 27px 1fr; gap: 5px; align-items: center; padding: 3px 0; }
     .suit-label { font-size: 17px; text-align: center; }
     .suit-label.red { color: #f17b72; }
@@ -108,36 +104,37 @@
     .results-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .results-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
     .sort-toggle { display: inline-flex; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-sm); }
-    .sort-button { min-height: 28px; padding: 4px 8px; color: var(--muted); background: transparent; border: 0; cursor: pointer; font-size: 11px; font-weight: 670; }
+    .sort-button { min-height: 28px; padding: 4px 8px; color: var(--muted); background: transparent; border: 0; cursor: pointer; font-size: 12px; font-weight: 670; }
     .sort-button + .sort-button { border-left: 1px solid var(--line); }
     .sort-button[aria-pressed="true"] { color: #182019; background: var(--gold); }
     .sort-button:active { transform: scale(.96); }
     .result-status { min-height: 18px; margin: 3px 0 9px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .result-status.running { color: var(--blue); }
+    .result-status.running { color: var(--gold); }
     .progress-wrap { display: none; margin: -2px 0 10px; }
     .progress-wrap.visible { display: block; }
     .compute-progress { width: 100%; height: 6px; appearance: none; overflow: hidden; background: var(--surface-soft); border: 0; border-radius: 999px; }
     .compute-progress::-webkit-progress-bar { background: var(--surface-soft); }
-    .compute-progress::-webkit-progress-value { background: var(--blue); border-radius: 999px; }
-    .compute-progress::-moz-progress-bar { background: var(--blue); border-radius: 999px; }
+    .compute-progress::-webkit-progress-value { background: var(--gold); border-radius: 999px; }
+    .compute-progress::-moz-progress-bar { background: var(--gold); border-radius: 999px; }
     .hand-list { display: grid; gap: 5px; }
     .hand-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) 45px; align-items: center; gap: 8px; min-width: 0; padding: 6px 0; }
     .hand-name { display: flex; align-items: center; gap: 5px; overflow: hidden; color: var(--muted); font-size: 12px; font-weight: 620; white-space: nowrap; }
-    .hand-strength { display: inline-grid; flex: none; width: 19px; height: 19px; place-items: center; color: var(--gold); background: color-mix(in oklch, var(--gold), transparent 88%); border: 1px solid color-mix(in oklch, var(--gold), transparent 62%); border-radius: 5px; font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .hand-strength { display: inline-grid; flex: none; width: 21px; height: 19px; place-items: center; color: var(--gold); background: color-mix(in oklch, var(--gold), transparent 88%); border: 1px solid color-mix(in oklch, var(--gold), transparent 62%); border-radius: 5px; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
     .probability-bar { height: 8px; overflow: hidden; background: var(--surface-soft); border-radius: 999px; }
     .probability-fill { display: block; width: var(--probability); height: 100%; min-width: var(--minimum-bar, 0); background: var(--bar-color); border-radius: inherit; }
     .hand-data { color: var(--ink); font-size: 13px; font-weight: 780; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .result-empty { padding: 9px 0 2px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .result-note { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
     .hidden { display: none !important; }
     html[data-theme="light"] .panel { background: rgb(255 255 255 / .82); }
-    html[data-theme="light"] .picker { background: rgb(24 48 34 / .035); box-shadow: 0 8px 18px rgb(24 48 34 / .09), inset 0 1px 9px rgb(24 48 34 / .05); }
+    html[data-theme="light"] .picker { background: rgb(24 48 34 / .035); }
     html[data-theme="light"] .chosen-card { color: var(--ink); background: #fff; box-shadow: 0 2px 0 rgb(30 50 38 / .15); }
     html[data-theme="light"] .chosen-card.red { color: #b83e39; }
     html[data-theme="light"] .chosen-card.private-card { color: var(--gold-deep); background-color: var(--surface-raised); }
     @keyframes deal-in { from { opacity: .25; transform: translateY(8px) scale(.82); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @media (hover: hover) { .card-choice:hover:not(:disabled) { color: #182019; background: var(--gold); transform: translateY(-2px); } .small-button:hover, .theme-button:hover { color: var(--ink); background: rgb(255 255 255 / .06); } .chosen-card:hover { transform: translateY(-1px); } }
     @media (min-width: 720px) { .app { padding: 24px 28px 40px; } .layout { grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr); } .results-panel { position: sticky; top: 16px; } }
-    @media (max-width: 390px) { .app { padding-left: 12px; padding-right: 12px; } .panel-header, .selected-area, .results-panel { padding-left: 12px; padding-right: 12px; } .picker-prompt { margin-left: 12px; margin-right: 12px; } .picker { margin-left: 6px; margin-right: 6px; padding-left: 7px; padding-right: 7px; } .suit-group { grid-template-columns: 24px 1fr; gap: 3px; } .card-grid { gap: 3px; } .card-choice { height: 29px; font-size: 11px; } .selection-row { grid-template-columns: 53px 1fr; gap: 5px; } .card-slots { gap: 4px; } .chosen-card, .empty-slot { width: 36px; height: 40px; font-size: 14px; } .hand-row { grid-template-columns: 86px minmax(0, 1fr) 45px; gap: 6px; } }
+    @media (max-width: 390px) { .app { padding-left: 12px; padding-right: 12px; } .panel-header, .selected-area, .results-panel { padding-left: 12px; padding-right: 12px; } .picker-prompt { margin-left: 12px; margin-right: 12px; } .picker { margin-left: 6px; margin-right: 6px; padding-left: 7px; padding-right: 7px; } .suit-group { grid-template-columns: 24px 1fr; gap: 3px; } .card-grid { gap: 3px; } .card-choice { height: 29px; font-size: 12px; } .selection-row { grid-template-columns: 53px 1fr; gap: 5px; } .card-slots { gap: 4px; } .chosen-card, .empty-slot { width: 36px; height: 40px; font-size: 15px; } .hand-row { grid-template-columns: 86px minmax(0, 1fr) 45px; gap: 6px; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
 </head>
@@ -156,7 +153,7 @@
         <p id="pickerPrompt" class="picker-prompt">点击下方任意牌，选择你的两张底牌</p>
         <div id="cardPicker" class="picker" aria-label="选择一张扑克牌"></div>
         <div class="selected-area">
-          <div class="selection-row"><span class="selection-label">我的底牌</span><div id="holeSlots" class="card-slots" aria-label="已选底牌"><button id="privacyButton" class="privacy-button" type="button" aria-pressed="true" aria-label="显示底牌" title="显示底牌"><span class="eye-icon" aria-hidden="true"></span></button></div></div>
+          <div class="selection-row"><span class="selection-label">我的底牌</span><div id="holeSlots" class="card-slots" aria-label="已选底牌"><button id="privacyButton" class="privacy-button" type="button" aria-pressed="false" aria-label="隐藏底牌" title="隐藏底牌"><span class="eye-icon" aria-hidden="true"></span></button></div></div>
           <div class="selection-row"><span class="selection-label">公共牌</span><div id="boardSlots" class="card-slots" aria-label="已选公共牌"></div></div>
         </div>
       </section>
@@ -166,8 +163,8 @@
           <h2 id="results-title">结果</h2>
           <div class="results-controls">
             <div class="sort-toggle" aria-label="概率呈现方式">
-              <button id="showAtLeast" class="sort-button" type="button" aria-pressed="true">重叠</button>
-              <button id="showExact" class="sort-button" type="button" aria-pressed="false">互斥</button>
+              <button id="showAtLeast" class="sort-button" type="button" aria-pressed="true">至少达到</button>
+              <button id="showExact" class="sort-button" type="button" aria-pressed="false">恰好是</button>
             </div>
             <div class="sort-toggle" aria-label="结果排序方式">
               <button id="sortByProbability" class="sort-button" type="button" aria-pressed="true">按概率</button>
@@ -181,6 +178,7 @@
         <div id="resultContent" class="hidden">
           <div id="handList" class="hand-list"></div>
         </div>
+        <p class="result-note">概率指发完公共牌后，你最终能成的牌型；不考虑对手手牌。</p>
       </section>
     </div>
   </main>
@@ -199,7 +197,7 @@
       { key: 3, name: '三条' }, { key: 2, name: '两对' }, { key: 1, name: '一对' }, { key: 0, name: '高牌' }
     ];
     const el = Object.fromEntries(['holeSlots','boardSlots','pickerPrompt','cardPicker','clearButton','themeToggle','privacyButton','showExact','showAtLeast','sortByProbability','sortByHand','resultStatus','progressWrap','computeProgress','resultEmpty','resultContent','handList'].map(id => [id, document.getElementById(id)]));
-    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, privacyEnabled = true, recentlyChosen = null, themeMode = 'dark', resultMode = 'atLeast', sortMode = 'probability', latestResult = null;
+    let hole = [], board = [], worker = null, workerUrl = null, calculating = false, privacyEnabled = false, recentlyChosen = null, themeMode = 'dark', resultMode = 'atLeast', sortMode = 'probability', latestResult = null;
     const cardText = id => RANKS[id % 13] + SUITS[Math.floor(id / 13)].symbol;
     const isRed = id => { const suit = Math.floor(id / 13); return suit === 1 || suit === 2; };
     const inputIsValid = () => hole.length === 2 && [0,3,4,5].includes(board.length);
@@ -228,13 +226,13 @@
     function addCard(id) { if (hole.includes(id) || board.includes(id)) return; stopCalculation(); if (hole.length < 2) hole.push(id); else if (board.length < 5) board.push(id); else return; recentlyChosen = id; refresh(); window.setTimeout(() => { recentlyChosen = null; }, 280); queueCalculation(); }
     function renderResults(data) {
       latestResult = data; const { counts, total } = data;
-      const handProbabilities = HANDS.filter(hand => hand.key !== 0).map(hand => {
+      const handProbabilities = HANDS.filter(hand => resultMode === 'exact' || hand.key !== 0).map(hand => {
         const count = resultMode === 'exact' ? counts[hand.key] : counts.reduce((sum, value, key) => sum + (key >= hand.key ? value : 0), 0);
         return { hand, pct: count / total * 100 };
       });
       handProbabilities.sort(sortMode === 'probability' ? (a,b) => b.pct - a.pct || b.hand.key - a.hand.key : (a,b) => b.hand.key - a.hand.key);
       const rows = handProbabilities.map(({hand,pct}) => { const row=document.createElement('div'); row.className='hand-row'; row.innerHTML = `<span class="hand-name" title="牌型强度 ${hand.key + 1} / 10"><span class="hand-strength">${hand.key + 1}</span>${hand.name}</span><span class="probability-bar" aria-hidden="true"><span class="probability-fill" style="--probability:${pct}%;--bar-color:var(--gold)"></span></span><span class="hand-data">${pct.toFixed(1)}%</span>`; return row; });
-      el.handList.replaceChildren(...rows); el.resultEmpty.classList.add('hidden'); el.resultContent.classList.remove('hidden'); el.resultStatus.textContent = resultMode === 'exact' ? '互斥概率，合计 100%' : '重叠概率，表示至少达到该牌力'; calculating=false;
+      el.handList.replaceChildren(...rows); el.resultEmpty.classList.add('hidden'); el.resultContent.classList.remove('hidden'); el.resultStatus.textContent = resultMode === 'exact' ? '恰好成该牌型，合计 100%（含高牌）' : '至少达到该牌力的概率'; calculating=false;
     }
     function workerSource() { return `
       const HAND={HIGH_CARD:0,ONE_PAIR:1,TWO_PAIR:2,THREE_OF_A_KIND:3,STRAIGHT:4,FLUSH:5,FULL_HOUSE:6,FOUR_OF_A_KIND:7,STRAIGHT_FLUSH:8,ROYAL_FLUSH:9};
