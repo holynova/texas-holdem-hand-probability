@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="360" viewBox="0 0 1200 360"
+     role="img" aria-labelledby="title desc">
+  <title id="title">德州扑克最终牌型概率计算器 — 精确穷举，不是蒙特卡洛</title>
+  <desc id="desc">深绿牌桌底标题：德州扑克牌型概率，副标题精确穷举，不是蒙特卡洛；右侧是示例牌局：底牌 A 红桃 K 红桃，公共牌 Q 红桃 J 红桃 9 梅花，同花概率 35.0%。</desc>
+
+  <rect width="1200" height="360" rx="26" fill="#101a17"/>
+
+  <g id="felt-decor" opacity="0.12" fill="none" stroke="#2dd4a8" stroke-width="2">
+    <ellipse cx="960" cy="200" rx="230" ry="140"/>
+    <ellipse cx="960" cy="200" rx="180" ry="105"/>
+  </g>
+
+  <g id="title-block" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="56" y="62" font-size="19" letter-spacing="3" fill="#7dd3b8">德州扑克 · TEXAS HOLD'EM ODDS</text>
+    <text x="56" y="128" font-size="58" font-weight="700" fill="#f5f7fa">德州扑克牌型概率</text>
+    <text x="56" y="168" font-size="23" fill="#e8ecf4">精确穷举，不是蒙特卡洛</text>
+    <text x="56" y="204" font-size="19" fill="#aab6cc">选好底牌与公共牌，算出最终最佳牌型的准确概率。</text>
+    <g id="chips" font-size="18" fill="#e8ecf4" text-anchor="middle">
+      <g><rect x="56" y="238" width="126" height="36" rx="18" fill="#16261f" stroke="#2a4a3e" stroke-width="1.5"/><text x="119" y="262">精确穷举</text></g>
+      <g><rect x="194" y="238" width="168" height="36" rx="18" fill="#16261f" stroke="#2a4a3e" stroke-width="1.5"/><text x="278" y="262">2,118,760 组合</text></g>
+      <g><rect x="374" y="238" width="126" height="36" rx="18" fill="#16261f" stroke="#2a4a3e" stroke-width="1.5"/><text x="437" y="262">10 种牌型</text></g>
+      <g><rect x="512" y="238" width="108" height="36" rx="18" fill="#16261f" stroke="#2a4a3e" stroke-width="1.5"/><text x="566" y="262">离线可用</text></g>
+    </g>
+  </g>
+
+  <g id="hand-diagram" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="700" y="40" font-size="18" fill="#7dd3b8">示例牌局 · 翻牌圈，同花听牌 + 两头顺听牌</text>
+    <g id="cards" font-size="22" font-weight="800" text-anchor="middle">
+      <g><rect x="700" y="56" width="52" height="72" rx="8" fill="#f5f7fa"/><text x="726" y="86" fill="#b83e39">A</text><text x="726" y="112" font-size="20" fill="#b83e39">♥</text></g>
+      <g><rect x="760" y="56" width="52" height="72" rx="8" fill="#f5f7fa"/><text x="786" y="86" fill="#b83e39">K</text><text x="786" y="112" font-size="20" fill="#b83e39">♥</text></g>
+      <g><rect x="832" y="56" width="52" height="72" rx="8" fill="#f5f7fa"/><text x="858" y="86" fill="#b83e39">Q</text><text x="858" y="112" font-size="20" fill="#b83e39">♥</text></g>
+      <g><rect x="892" y="56" width="52" height="72" rx="8" fill="#f5f7fa"/><text x="918" y="86" fill="#b83e39">J</text><text x="918" y="112" font-size="20" fill="#b83e39">♥</text></g>
+      <g><rect x="952" y="56" width="52" height="72" rx="8" fill="#f5f7fa"/><text x="978" y="86" fill="#172019">9</text><text x="978" y="112" font-size="20" fill="#172019">♣</text></g>
+    </g>
+    <g id="card-labels" font-size="17" fill="#aab6cc" text-anchor="middle">
+      <text x="756" y="152">底牌</text>
+      <text x="918" y="152">公共牌（翻牌）</text>
+    </g>
+    <g id="bars" font-size="18">
+      <g>
+        <text x="700" y="200" fill="#e8ecf4">同花 ≥</text>
+        <rect x="780" y="184" width="280" height="16" rx="8" fill="#1e332b"/>
+        <rect x="780" y="184" width="98" height="16" rx="8" fill="#e8c15a"/>
+        <g><rect x="1066" y="182" width="72" height="22" fill="#101a17"/><text x="1072" y="200" fill="#e8ecf4">35.0%</text></g>
+      </g>
+      <g>
+        <text x="700" y="236" fill="#e8ecf4">顺子 ≥</text>
+        <rect x="780" y="220" width="280" height="16" rx="8" fill="#1e332b"/>
+        <rect x="780" y="220" width="126" height="16" rx="8" fill="#e8c15a"/>
+        <g><rect x="1066" y="218" width="72" height="22" fill="#101a17"/><text x="1072" y="236" fill="#e8ecf4">45.0%</text></g>
+      </g>
+      <g>
+        <text x="700" y="272" fill="#e8ecf4">一对 ≥</text>
+        <rect x="780" y="256" width="280" height="16" rx="8" fill="#1e332b"/>
+        <rect x="780" y="256" width="231" height="16" rx="8" fill="#e8c15a"/>
+        <g><rect x="1066" y="254" width="72" height="22" fill="#101a17"/><text x="1072" y="272" fill="#e8ecf4">82.5%</text></g>
+      </g>
+    </g>
+    <text x="700" y="316" font-size="18" fill="#aab6cc">C(47,2) = 1,081 种补牌，逐一枚举、逐一判定</text>
+  </g>
+</svg>
